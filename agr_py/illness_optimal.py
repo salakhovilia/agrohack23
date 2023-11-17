@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from python.weather import Weather
+from weather import Weather
 
 class IllnessOptimal(ABC):
     @abstractmethod

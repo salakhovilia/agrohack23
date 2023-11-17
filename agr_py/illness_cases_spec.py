@@ -1,10 +1,10 @@
 from ast import List
 from enum import Enum
 from abc import ABC, abstractmethod
-from python.illness_optimal import IllnessOptimal, WellDefinedIllnessOptimal
-from python.illness_start import AbsIllnessStart, IllnessStart, UnknownIllnessStart, WTF_PH_IllnessStart
-from python.incub_duration import ConcretePreservDuration, InfinitePreserveDuration, PreservDuration
-from python.incub_period import DayIncubPeriod, IncubPeriod, UnknownIncubPeriod, YearsIncubPeriod
+from illness_optimal import IllnessOptimal, WellDefinedIllnessOptimal
+from illness_start import AbsIllnessStart, IllnessStart, UnknownIllnessStart, WTF_PH_IllnessStart
+from incub_duration import ConcretePreservDuration, InfinitePreserveDuration, PreservDuration
+from incub_period import DayIncubPeriod, IncubPeriod, UnknownIncubPeriod, YearsIncubPeriod
         
 class IllnessCase(Enum):
     MILDEW = (
@@ -95,3 +95,4 @@ class IllnessCase(Enum):
         self.preservation_duration = preservation_duration
         self.illness_begin = illness_begin
         self.illness_optimal = illness_optimal
+        self.incub_period = incub_period
