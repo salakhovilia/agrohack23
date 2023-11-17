@@ -14,6 +14,10 @@ class ConcretePreservDuration(PreservDuration):
     def __init__(self, years) -> None:
         super().__init__()
         self.timedelta = yearsIntToTimeDelta(years)
+        if isinstance(years, list) :
+            self.years = years
+        else:
+            self.years = [0, years]
         print("timedelta days:" + self.timedelta.days)
 
 class InfinitePreserveDuration(PreservDuration):

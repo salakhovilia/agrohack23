@@ -4,6 +4,11 @@ from abc import ABC, abstractmethod
 class AbsIllnessStart(ABC):
     pass
 
+class WTF_PH_IllnessStart(ABC):
+    def __init__(self, ph : list[float]) -> None:
+        super().__init__()
+        self.ph = ph
+
 class IllnessStart(AbsIllnessStart):
     def __init__(self, temp: float, hum) -> None:
         self.temp = temp 
