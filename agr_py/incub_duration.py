@@ -18,7 +18,6 @@ class ConcretePreservDuration(PreservDuration):
             self.years = years
         else:
             self.years = [0, years]
-        print("timedelta days:" + self.timedelta.days)
 
 class InfinitePreserveDuration(PreservDuration):
     def __init__(self) -> None:
