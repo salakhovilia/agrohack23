@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-
+from incub_duration import DAYS_PER_YEAR
 
 class IncubPeriod(ABC):
     @abstractmethod
@@ -10,7 +10,6 @@ class DayIncubPeriod(IncubPeriod):
         super().__init__()
         self.days = days
         
-    
     def periodInDays(self):
         return self.days
     
@@ -18,13 +17,12 @@ class DayIncubPeriod(IncubPeriod):
 class YearsIncubPeriod(IncubPeriod):
     def __init__(self, years: list[int]) -> None:
         super().__init__()
-        self.days = map(years, lambda year: days_per_year * year)
+        self.days = map(years, lambda year: DAYS_PER_YEAR * year)
         
-            
     def periodInDays(self):
         return self.days
     
-class EmptyIncubPeriod(IncubPeriod):
+class UnknownIncubPeriod(IncubPeriod):
     def __init__(self) -> None:
         super().__init__()
         

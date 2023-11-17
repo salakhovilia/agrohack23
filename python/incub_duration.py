@@ -1,22 +1,22 @@
 from datetime import timedelta
 
 
-days_per_year = 365.25
+DAYS_PER_YEAR = 365.25
 
 def yearsIntToTimeDelta(years):
-    return timedelta(days_per_year * years)
+    return timedelta(DAYS_PER_YEAR * years)
 
-class IncubDuration:
+class PreservDuration:
     def __init__(self) -> None:
         pass
 
-class ConcreteIncubDuration(IncubDuration):
+class ConcretePreservDuration(PreservDuration):
     def __init__(self, years) -> None:
         super().__init__()
         self.timedelta = yearsIntToTimeDelta(years)
         print("timedelta days:" + self.timedelta.days)
 
-class InfiniteIncubDuration(IncubDuration):
+class InfinitePreserveDuration(PreservDuration):
     def __init__(self) -> None:
         super().__init__()        
         
