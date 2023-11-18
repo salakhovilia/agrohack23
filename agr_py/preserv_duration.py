@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-
 DAYS_PER_YEAR = 365.25
 
 def yearsIntToTimeDelta(years):

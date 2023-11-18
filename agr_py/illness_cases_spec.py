@@ -1,9 +1,10 @@
 from ast import List
 from enum import Enum
 from abc import ABC, abstractmethod
+from weather import Weather
 from illness_optimal import IllnessOptimal, WellDefinedIllnessOptimal
 from illness_start import AbsIllnessStart, IllnessStart, UnknownIllnessStart, WTF_PH_IllnessStart
-from incub_duration import ConcretePreservDuration, InfinitePreserveDuration, PreservDuration
+from preserv_duration import ConcretePreservDuration, InfinitePreserveDuration, PreservDuration
 from incub_period import DayIncubPeriod, IncubPeriod, UnknownIncubPeriod, YearsIncubPeriod
         
 class IllnessCase(Enum):
@@ -86,8 +87,8 @@ class IllnessCase(Enum):
     
     def __init__(self,
                  preservation_duration: PreservDuration,
-                 illness_begin: AbsIllnessStart | None,
-                 illness_optimal: IllnessOptimal | None,
+                 illness_begin: AbsIllnessStart,
+                 illness_optimal: IllnessOptimal,
                  incub_period : IncubPeriod,
                  ) -> None:
         super().__init__()
@@ -104,3 +105,11 @@ illness start : {self.illness_begin};
 illness optim.: {self.illness_optimal};
 incub period  : {self.incub_period};
 """
+
+    def illness_can_start(self, weather: Weather) -> bool:
+        return self.illness_begin.matches(weather)
+    
+    def  illness_at_optimal(self, weather: Weather) -> bool:
+        return self.illness_optimal.check_weather_satisfies_this_condition(weather=weather)
+    
+    # def incub_period_satisfied(self, weather: Weather, history) -> bool

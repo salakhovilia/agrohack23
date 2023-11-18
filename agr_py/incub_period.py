@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from incub_duration import DAYS_PER_YEAR
+from preserv_duration import DAYS_PER_YEAR
 
 class IncubPeriod(ABC):
     @abstractmethod
