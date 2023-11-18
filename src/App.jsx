@@ -1,17 +1,12 @@
 import './App.css';
-import { Navbar, NavbarBrand, NavbarContent } from '@nextui-org/react';
 import { Outlet } from 'react-router-dom';
 
 function App() {
   return (
     <>
-      <Navbar className={'navbar bg-primary text-black'} isBlurred={true} position={'static'}>
-        <NavbarContent>
-          <NavbarBrand>
-            <p className="font-bold text-white">Agrocode</p>
-          </NavbarBrand>
-        </NavbarContent>
-      </Navbar>
+      <div className="navbar bg-base-100">
+        <a className="btn btn-ghost text-xl">Ferma in the Air</a>
+      </div>
       <main className="h-full w-full">
         <Outlet />
       </main>

@@ -73,21 +73,22 @@ export default function Index() {
     }
   }, [map, isInitialized]);
 
-  return <>
-<div class="container">
-  <div class="MAP">
-    <div id="map" className="h-full w-full" ref={container} /> 
-  </div>
-  <div class="TimeGraphs">
-    <p> Temp Humidity and Rain graph using Char.js</p>
-  </div>
-  <div class="CurrentWeather">
-    <p>DCurrent Weather widget if we have time</p>
-  </div>
-  <div class="DataBlock">
-    <p>Data goes here:</p>
-  </div>
-</div>
-  </>
-
+  return (
+    <>
+      <div className="area container grid h-full w-full grid-flow-row grid-cols-3 grid-rows-3 gap-1">
+        <div className="MAP">
+          <div id="map" className="h-full w-full" ref={container} />
+        </div>
+        <div className="TimeGraphs">
+          <p> Temp Humidity and Rain graph using Char.js</p>
+        </div>
+        <div className="CurrentWeather">
+          <p>DCurrent Weather widget if we have time</p>
+        </div>
+        <div className="DataBlock">
+          <p>Data goes here:</p>
+        </div>
+      </div>
+    </>
+  );
 }
