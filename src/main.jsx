@@ -5,6 +5,7 @@ import './index.css';
 import { NextUIProvider } from '@nextui-org/react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Index from './pages/index.jsx';
+import { YMaps } from '@pbe/react-yandex-maps';
 
 const router = createBrowserRouter([
   {

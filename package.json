@@ -13,6 +13,7 @@
   "dependencies": {
     "@nextui-org/react": "^2.2.9",
     "framer-motion": "^10.16.5",
+    "h3-js": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.19.0"
