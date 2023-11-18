@@ -75,7 +75,7 @@ export default function Index() {
 
   return (
     <>
-      <div className="area container grid h-full w-full grid-flow-row grid-cols-3 grid-rows-3 gap-1">
+      <div className="area container grid h-full min-h-full w-full min-w-full grid-flow-row grid-cols-3 grid-rows-3 gap-1">
         <div className="MAP">
           <div id="map" className="h-full w-full" ref={container} />
         </div>
