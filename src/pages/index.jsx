@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as h3 from 'h3-js';
+import Datepicker from "react-tailwindcss-datepicker";
 
 export default function Index() {
   const container = useRef(null);
@@ -87,6 +88,7 @@ export default function Index() {
         </div>
         <div className="DataBlock">
           <p>Data goes here:</p>
+          <Datepicker asSingle={true} useRange={false}/>
         </div>
       </div>
     </>
