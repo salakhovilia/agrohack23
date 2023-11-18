@@ -5,14 +5,14 @@ import { Outlet } from 'react-router-dom';
 function App() {
   return (
     <>
-      <Navbar className={'bg-indigo-600'} isBlurred={true} position={'sticky'}>
+      <Navbar className={'navbar bg-primary text-black'} isBlurred={true} position={'static'}>
         <NavbarContent>
           <NavbarBrand>
             <p className="font-bold text-white">Agrocode</p>
           </NavbarBrand>
         </NavbarContent>
       </Navbar>
-      <main className="h-full w-full bg-indigo-950">
+      <main className="h-full w-full">
         <Outlet />
       </main>
     </>
