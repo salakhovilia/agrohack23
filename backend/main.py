@@ -2,6 +2,7 @@ import datetime
 import json
 
 import aiohttp
+import aiohttp_cors
 import h3
 from aiohttp import web
 
@@ -26,9 +27,12 @@ async def get_polygons(request: web.Request):
         [x2, y1],
     ]
 
-    cells = h3.polygon_to_cells(h3.Polygon(view_coords), 7)
+    cells = h3.polygon_to_cells(h3.Polygon(view_coords), 6)
 
     map = []
+
+    print('hexagons:', len(cells))
+
     for cell in cells:
         hexagon = {
             'cellId': cell,
@@ -58,6 +62,9 @@ async def get_polygons(request: web.Request):
             response = await session.get(url, params=params)
             data = await response.json()
 
+            if not data:
+                print('skip', json.dumps(params))
+                continue
             hexagon['weather'] = data['hourly']
 
         map.append(hexagon)
@@ -66,6 +73,18 @@ async def get_polygons(request: web.Request):
 
 
 app.add_routes([web.get('/polygons', get_polygons)])
+
+cors = aiohttp_cors.setup(app, defaults={
+    "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+        )
+})
+
+# Configure CORS on all routes.
+for route in list(app.router.routes()):
+    cors.add(route)
 
 if __name__ == '__main__':
     web.run_app(app)
