@@ -10,7 +10,6 @@ def test_alternarioz_5_days():
     hums = common_hums
 
     illness_days = map_weather_to_historic_data(temps, hums)
-
     illness = IllnessCase.ALTERNARIOZ
 
     assert [
