@@ -13,13 +13,17 @@ class PreservDuration:
 class ConcretePreservDuration(PreservDuration):
     def __init__(self, years) -> None:
         super().__init__()
-        self.timedelta = yearsIntToTimeDelta(years)
         if isinstance(years, list) :
             self.years = years
         else:
             self.years = [0, years]
+        self.timedeltas = map(lambda year: yearsIntToTimeDelta(year), self.years)
+    def __str__(self) -> str:
+        return f"years: {self.years}"
 
 class InfinitePreserveDuration(PreservDuration):
     def __init__(self) -> None:
-        super().__init__()        
+        super().__init__()    
+    def __str__(self) -> str:
+        return "infinite"
         

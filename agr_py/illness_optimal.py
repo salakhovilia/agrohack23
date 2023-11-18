@@ -15,3 +15,9 @@ class WellDefinedIllnessOptimal(IllnessOptimal):
         self.temps = temps
         self.hums = hums
         
+    def check_weather_satisfies_this_condition(weather: Weather) -> bool:
+        # todo заимплементить нормально
+        return False
+    
+    def __str__(self) -> str:
+        return f"temperatures {self.temps}, humidity {self.hums}"

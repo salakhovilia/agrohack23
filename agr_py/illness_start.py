@@ -8,6 +8,8 @@ class WTF_PH_IllnessStart(ABC):
     def __init__(self, ph : list[float]) -> None:
         super().__init__()
         self.ph = ph
+    def __str__(self) -> str:
+        return f"PH {self.ph}"
 
 class IllnessStart(AbsIllnessStart):
     def __init__(self, temp: float, hum) -> None:
@@ -21,7 +23,11 @@ class IllnessStart(AbsIllnessStart):
             self.hum = hum
         else:
             self.hum = [hum, hum]
+    def __str__(self) -> str:
+        return f"temp {self.temp}, hum {self.hum}"
 
 class UnknownIllnessStart(AbsIllnessStart):
     def __init__(self) -> None:
         super().__init__()
+    def __str__(self) -> str:
+        return "unknown"
