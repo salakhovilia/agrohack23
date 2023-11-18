@@ -8,7 +8,6 @@ class HistoryContext():
         
         pass
     
-    
 class Illnesses():
     def __init__(self, illnesses) -> None:
         self.illnesses = illnesses
