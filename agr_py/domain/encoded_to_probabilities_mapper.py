@@ -3,6 +3,20 @@ from illness_cases_spec import IllnessCase
 from raw_data_to_cases_mapper import IllnessDays, IllnessDayEnc
 
 
+def normalize_weighted_average(value: float) -> float:
+    min_value = get_weight(IllnessDayEnc.NONE_CONDITION_SATISF)
+    return (value - min_value) / (get_weight(IllnessDayEnc.OPTIMAL_CONDITION_SATISF) - min_value)
+
+
+def get_weight(illness_case: IllnessDayEnc):
+    if IllnessDayEnc.NONE_CONDITION_SATISF == illness_case:
+        return 0.5
+    elif IllnessDayEnc.START_CONDITION_SATISF == illness_case:
+        return 1
+    elif IllnessDayEnc.OPTIMAL_CONDITION_SATISF == illness_case:
+        return 3
+
+
 class IllnessProbabilities():
     def __init__(self):
         self.illness_to_prob: dict[IllnessCase, float] = {}
@@ -19,18 +33,6 @@ class TimeSeriesCharacteristicsAccumulator():
         pass
 
 
-def normalize_weighted_average(value: float) -> float:
-    min_value = get_weight(IllnessDayEnc.NONE_CONDITION_SATISF)
-    return (value - min_value) / (get_weight(IllnessDayEnc.OPTIMAL_CONDITION_SATISF) - min_value)
-
-
-def get_weight(illness_case: IllnessDayEnc):
-    if IllnessDayEnc.NONE_CONDITION_SATISF == illness_case:
-        return 0.5
-    elif IllnessDayEnc.START_CONDITION_SATISF == illness_case:
-        return 1
-    elif IllnessDayEnc.OPTIMAL_CONDITION_SATISF == illness_case:
-        return 3
 
 
 class PeriodValuesProvider():
