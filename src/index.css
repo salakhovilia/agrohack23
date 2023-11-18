@@ -9,17 +9,11 @@ html, body {
 }
 
 
-.container {  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap: 1em 1em;
-  grid-auto-flow: row;
+.container {
   grid-template-areas:
     "DataBlock MAP MAP"
     "DataBlock MAP MAP"
     "CurrentWeather TimeGraphs TimeGraphs";
-  width: 100%;
-  height: 100%;
 }
 
 .MAP { grid-area: MAP; }
