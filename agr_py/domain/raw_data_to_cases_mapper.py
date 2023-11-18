@@ -1,4 +1,3 @@
-from typing import Any
 from illness_cases_spec import IllnessCase
 from weather import Weather, WeatherData
 from enum import Enum
@@ -10,10 +9,22 @@ class IllnessDayEnc(Enum):
     OPTIMAL_CONDITION_SATISF = 2
 
 
+def illn_none():
+    return IllnessDayEnc.NONE_CONDITION_SATISF
+
+
+def illn_start():
+    return IllnessDayEnc.START_CONDITION_SATISF
+
+
+def illn_optimal():
+    return IllnessDayEnc.OPTIMAL_CONDITION_SATISF
+
+
 illness_historic_data = list[IllnessDayEnc]
 
 
-class IllnessEntry():
+class IllnessEntry:
     def __init__(self, illness: IllnessCase) -> None:
         self.illness = illness
         self.illness_days_enc: illness_historic_data = []
@@ -41,7 +52,7 @@ class HistoryContext():
         return self.illness_entries[illness]
 
 
-class IllnessDays():
+class IllnessDays:
     def __init__(self) -> None:
         self.illness_to_historic_data: dict[IllnessCase, illness_historic_data] = {}
         pass
@@ -66,6 +77,7 @@ def map_single_time_weather_to_illnesses_days(
             illness_entry.add_start_condition_satisfied()
         else:
             illness_entry.add_none_condition_satisfied()
+
 
 def map_weather_to_historic_data(
         dayly_temps: list[float],

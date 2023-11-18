@@ -33,7 +33,7 @@ class WTF_PH_IllnessStart(ABC):
 
 
 class IllnessStart(AbsIllnessStart):
-    def __init__(self, temp: float, hum) -> None:
+    def __init__(self, temp: float | list[float], hum) -> None:
         super().__init__()
         self.temp = temp
         self.hum = hum
@@ -50,8 +50,7 @@ class IllnessStart(AbsIllnessStart):
         return f"temp {self.temp}, hum {self.hum}"
 
     def matches(self, weather: Weather):
-        return (target_temp_in_temps(weather.temp(), self.temp) or \
-                self.temp[1] <= weather.temp()) and \
+        return (target_temp_in_temps(weather.temp(), self.temp) or self.temp[1] <= weather.temp()) and \
             target_hum_in_hums(weather.hum(), self.hum)
 
 

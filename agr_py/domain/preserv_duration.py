@@ -19,7 +19,7 @@ class ConcretePreservDuration(PreservDuration):
             self.years = years
         else:
             self.years = [0, years]
-        self.time_deltas = map(lambda year: yearsIntToTimeDelta(year), self.years)
+        self.time_deltas = map(lambda year: years_int_to_time_delta(year), self.years)
 
     def __str__(self) -> str:
         return f"years: {self.years}"
