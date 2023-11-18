@@ -71,7 +71,7 @@ class SlidingWindowIncubPeriodAccumulator():
         return self.period_values_provider.get_incub_period_in_time_unit(self.illness.incub_period)
 
     def map(self) -> list[float] | list[IllnessDayEnc]:
-        if self.illness.incub_period is UnknownIncubPeriod:
+        if isinstance(self.illness.incub_period, UnknownIncubPeriod):
             return self.prev_stage_values
 
         size = len(self.prev_stage_values)
