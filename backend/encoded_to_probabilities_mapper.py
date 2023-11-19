@@ -1,9 +1,10 @@
 import math
 
-from incub_period import UnknownIncubPeriod, IncubPeriod
+import pandas as pd
+
 from illness_cases_spec import IllnessCase
+from incub_period import UnknownIncubPeriod, IncubPeriod
 from raw_data_to_cases_mapper import IllnessDays, IllnessConditEnc
-from sklearn.linear_model import LogisticRegression
 
 
 class WeightsProvider:
@@ -20,14 +21,14 @@ class WeightsProvider:
     def get_weight(self, illness_case: IllnessConditEnc):
         return self.weight_map[illness_case]
 
+    def weight_sum(self):
+        return sum(self.weight_map.values())
+
     def get_exponential_growth_factor(self) -> float:
         return self.weight_map
 
 
-def normalize_weighted_average(value: float, illnessDayEncWeightProvider: WeightsProvider) -> float:
-    min_value = illnessDayEncWeightProvider.get_weight(IllnessConditEnc.NONE_CONDITION_SATISF)
-    return (value - min_value) / (
-            illnessDayEncWeightProvider.get_weight(IllnessConditEnc.OPTIMAL_CONDITION_SATISF) - min_value)
+
 
 
 class IllnessProbabilities():
@@ -69,7 +70,7 @@ class WeightNormalizer:
 
 
 class SlidingWindowIncubPeriodAccumulator:
-    def __init__(self, illness: IllnessCase, encoded_values: list[IllnessConditEnc],
+    def __init__(self, illness: IllnessCase, encoded_values: list[float],
                  period_values_provider: PeriodValuesProvider,
                  weights_provider: WeightsProvider
                  ):
@@ -85,13 +86,13 @@ class SlidingWindowIncubPeriodAccumulator:
 
         for i in range(index_start, index_end_non_incl):
             value = prev_stage_value[i]
-            acc += self.illness_day_enc_weight_provider.get_weight(illness_case=value)
+            acc += value
 
         range_value = index_end_non_incl - index_start
 
         raw_average = acc / float(range_value)
 
-        return normalize_weighted_average(raw_average, self.illness_day_enc_weight_provider)
+        return raw_average # normalize_weighted_average(raw_average, self.illness_day_enc_weight_provider)
 
     def get_incub_period(self):
         return self.period_values_provider.get_incub_period_in_time_unit(self.illness.incub_period)
@@ -112,8 +113,10 @@ class SlidingWindowIncubPeriodAccumulator:
 
         earliest_incub_period = incub_period[0]
 
+        mean_value = sum(self.prev_stage_values) / len(self.prev_stage_values)
+
         for i in range(0, earliest_incub_period - 1):
-            target_arr.append(None)
+            target_arr.append(mean_value)
 
         for i in range(earliest_incub_period - 1, size):
             sliding_window_value = self.get_value_for_range(
@@ -160,10 +163,6 @@ class ForTargetDateWeightedExponentialAccumulator():
     #     normalized_values = [val / max_value for val in weights]
     #     return normalized_values
 
-    def normalize_weights(self, weights: list[float]) -> list[float]:
-        total_weight_sum = sum(weights)
-        return [weight / total_weight_sum for weight in weights]
-
     def map(self) -> list[float]:
         size = len(self.encoded_values)
         target_arr = []
@@ -184,7 +183,7 @@ def normalize_weights(weights: list[float]) -> list[float]:
 class ForTargetDateWeightedExponentialAccumulator():
     def __init__(self,
                  illness: IllnessCase,
-                 encoded_values: list[IllnessConditEnc],
+                 encoded_values: list[float],
                  illness_day_enc_weight_provider: WeightsProvider):
         self.illness = illness
         self.encoded_values = encoded_values
@@ -211,11 +210,13 @@ class ForTargetDateWeightedExponentialAccumulator():
     #     normalized_values = [val / max_value for val in weights]
     #     return normalized_values
 
-    def calculate_ema(self, values: list[float], alpha: float) -> list[float]:
+    def calculate_ema(self, alpha: float) -> list[float]:
         ema_values = []
-        ema_previous = values[0]  # You could also initialize this to 0 or another starting value.
+        source_values = self.encoded_values
 
-        for value in values:
+        ema_previous = source_values[0]  # You could also initialize this to 0 or another starting value.
+
+        for value in source_values:
             ema_current = (value * alpha) + (ema_previous * (1 - alpha))
             ema_values.append(ema_current)
             ema_previous = ema_current
@@ -239,7 +240,6 @@ class ForTargetDateWeightedExponentialAccumulator():
 
     def map(self) -> list[float]:
         size = len(self.encoded_values)
-        target_arr = []
         alpha = 2 / (size + 1)  # Example of how to calculate alpha.
 
         # for i, value in enumerate(self.encoded_values):
@@ -247,9 +247,74 @@ class ForTargetDateWeightedExponentialAccumulator():
         #     target_arr.append(weighted_value)
 
         # Apply EMA to the values
-        ema_values = self.calculate_ema(target_arr, alpha)
+        ema_values = self.calculate_ema(alpha)
 
         # Normalize the EMA values to convert into probabilities
-        return normalize_weights(ema_values)
+        return ema_values
+
+# ... [rest of the class definition]
+
+
+class EwmaAccumulator():
+    def __init__(self,
+                 illness: IllnessCase,
+                 encoded_values: list[float],
+                 illness_day_enc_weight_provider: WeightsProvider):
+        self.illness = illness
+        self.encoded_values = encoded_values
+        self.weights_provider = illness_day_enc_weight_provider
+
+    # def normalize_weights(self, weights: list[float]) -> list[float]:
+    #     max_value = max(weights)
+    #     normalized_values = [val / max_value for val in weights]
+    #     return normalized_values
+
+    def calculate_ema(self, alpha: float) -> list[float]:
+        ema_values = []
+        source_values = self.encoded_values
+
+        ema_previous = source_values[0]  # You could also initialize this to 0 or another starting value.
+
+        for value in source_values:
+            ema_current = (value * alpha) + (ema_previous * (1 - alpha))
+            ema_values.append(ema_current)
+            ema_previous = ema_current
+
+        return ema_values
+
+    # def map(self) -> list[float]:
+    #     size = len(self.encoded_values)
+    #     target_arr = []
+    #     alpha = 2 / (size + 1)  # Example of how to calculate alpha.
+    #
+    #     for i, value in enumerate(self.encoded_values):
+    #         weighted_value = self.get_weighted_value(value, i)
+    #         target_arr.append(weighted_value)
+    #
+    #     # Apply EMA to the values
+    #     ema_values = self.calculate_ema(target_arr, alpha)
+    #
+    #     # Normalize the EMA values to convert into probabilities
+    #     return normalize_weights(ema_values)
+
+    def map(self) -> list[float]:
+        size = len(self.encoded_values)
+        alpha = 2 / (size + 1)  # Example of how to calculate alpha.
+
+        # for i, value in enumerate(self.encoded_values):
+        #     weighted_value = self.get_weighted_value(value, i)
+        #     target_arr.append(weighted_value)
+
+        data_series = pd.Series(self.encoded_values)
+        ewma = data_series.ewm(alpha=alpha, adjust=False).mean()
+
+        # Convert EWMA Series to a NumPy array
+        ewma_array = ewma.to_numpy()
+
+        # Optionally, convert to a Python list
+        ewma_list = ewma_array.tolist()
+
+        # Normalize the EMA values to convert into probabilities
+        return ewma_list
 
 # ... [rest of the class definition]

@@ -1,7 +1,7 @@
 import json
 
 from encoded_to_probabilities_mapper import WeightsProvider, PeriodValuesProvider, SlidingWindowIncubPeriodAccumulator, \
-    ForTargetDateWeightedExponentialAccumulator
+    ForTargetDateWeightedExponentialAccumulator, EwmaAccumulator
 from illness_cases_spec import IllnessCase
 from raw_data_to_cases_mapper import IllnessConditEnc, map_weather_to_historic_data
 
@@ -33,6 +33,16 @@ def get_illness_prob_for_each_timeunit_def(
 
 def map_hums(source_hums: list[float]) -> list[float]:
     return list(map(lambda hum: hum / 100.0, source_hums))
+
+
+def normalize_weights(weights: list[IllnessConditEnc], weight_provider: WeightsProvider) -> list[float]:
+    return [weight_provider.get_weight(weight) / weight_provider.weight_sum() for weight in weights]
+
+
+def normalize_weighted_average(value: float, weight_provider: WeightsProvider) -> float:
+    min_value = weight_provider.get_weight(IllnessConditEnc.NONE_CONDITION_SATISF)
+    return (value - min_value) / (
+            weight_provider.get_weight(IllnessConditEnc.OPTIMAL_CONDITION_SATISF) - min_value)
 
 
 def get_illness_prob_for_each_timeunit(none_satisf_weight: float,
@@ -67,23 +77,34 @@ def get_illness_prob_for_each_timeunit(none_satisf_weight: float,
 
     per_illness_mapped_data = mapped_data.get_illness_historic_data(illness)
 
+    normalized_weights = normalize_weights(per_illness_mapped_data, weight_provider)
+
     # considering incubation period whether possible
 
     sliding_window_incub_period_acc = SlidingWindowIncubPeriodAccumulator(
         illness=illness,
-        encoded_values=per_illness_mapped_data,
+        encoded_values=normalized_weights,
         period_values_provider=period_values_provider,
         weights_provider=weight_provider
     )
 
     if sliding_window_incub_period_acc.is_applicable():
         sliding_window_acc_probs_normalized = sliding_window_incub_period_acc.map()
-        return sliding_window_acc_probs_normalized
-    else:
-        expon_weight_acc = ForTargetDateWeightedExponentialAccumulator(
+
+        expon_weight_acc = EwmaAccumulator(
             illness=illness,
-            encoded_values=per_illness_mapped_data,
-            illness_day_enc_weight_provider=weight_provider
+            encoded_values=sliding_window_acc_probs_normalized,
+            illness_day_enc_weight_provider=weight_provider,
+        )
+
+        expon_weights_mapped = expon_weight_acc.map()
+        return expon_weights_mapped
+
+    else:
+        expon_weight_acc = EwmaAccumulator(
+            illness=illness,
+            encoded_values=normalized_weights,
+            illness_day_enc_weight_provider=weight_provider,
         )
 
         expon_weights_mapped = expon_weight_acc.map()
