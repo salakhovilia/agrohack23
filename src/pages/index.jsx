@@ -198,7 +198,7 @@ export default function Index() {
 
       map.current.geoObjects.add(polygon);
     }
-  }, [map, isInitialized, hexagons, bounds, isSelectingMode]);
+  }, [map, isInitialized, hexagons, isSelectingMode]);
 
   useEffect(() => {
     if (!currentHexagon) return;
