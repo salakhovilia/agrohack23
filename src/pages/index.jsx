@@ -5,6 +5,7 @@ import { Chart } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import 'chartjs-adapter-moment';
 import { ru } from 'date-fns/locale';
+import * as h3 from 'h3-js';
 
 ChartJS.register(...registerables);
 
@@ -22,6 +23,14 @@ export default function Index() {
   const mapState = useMemo(() => ({ center: coords, zoom }), [coords, zoom]);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  const [isSelectingMode, setSelectingMode] = useState(false);
+
+  const [selectedHexagons, setSelectedHexagons] = useState(
+    localStorage.getItem('selectedHexagons')
+      ? JSON.parse(localStorage.getItem('selectedHexagons'))
+      : {},
+  );
+
   const [hexagons, setHexagons] = useState([]);
   const [currentHexagon, setCurrentHexagon] = useState({
     center: [0, 0],
@@ -31,15 +40,14 @@ export default function Index() {
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
   const fetchData = () => {
+    if (!Object.keys(selectedHexagons).length) return;
+
     axios
       .get('/polygons', {
         baseURL: 'http://localhost:8080',
         params: {
           now: new Date('2021-05-02').getTime(),
-          x1: 44.94645256897698,
-          y1: 37.29703876822711,
-          x2: 44.65134306217837,
-          y2: 37.94715169000219,
+          ids: Object.keys(selectedHexagons),
         },
       })
       .then((response) => {
@@ -73,46 +81,123 @@ export default function Index() {
     fetchData();
   }, [date]);
 
-  const [, setBounds] = useState([]);
+  useEffect(() => {
+    if (isSelectingMode) return;
+
+    fetchData();
+  }, [isSelectingMode]);
+
+  useEffect(() => {
+    localStorage.setItem('selectedHexagons', JSON.stringify(selectedHexagons));
+  }, [selectedHexagons]);
+
+  const [bounds, setBounds] = useState([]);
 
   useEffect(() => {
     if (!map.current) return;
 
-    // const viewCoords = [
-    //   [44.94645256897698, 37.29703876822711],
-    //   [44.65134306217837, 37.29703876822711],
-    //   [44.65134306217837, 37.94715169000219],
-    //   [44.94645256897698, 37.94715169000219],
-    //   [44.94645256897698, 37.29703876822711],
-    // ];
+    map.current.geoObjects.removeAll();
 
-    // console.log(Math.round(map.current.getZoom() / 23 + 8));
+    const cells = [];
+    if (isSelectingMode) {
+      // const viewCoords = [
+      //   [44.94645256897698, 37.29703876822711],
+      //   [44.65134306217837, 37.29703876822711],
+      //   [44.65134306217837, 37.94715169000219],
+      //   [44.94645256897698, 37.94715169000219],
+      //   [44.94645256897698, 37.29703876822711],
+      // ];
 
-    console.log('Cells:', hexagons.length);
-    console.log(hexagons);
+      const localBounds = map.current.getBounds();
 
-    for (const hexagon of hexagons) {
+      const viewCoords = [
+        localBounds[0],
+        [localBounds[0][0], localBounds[1][1]],
+        localBounds[1],
+        [localBounds[1][0], localBounds[0][1]],
+      ];
+
+      console.log(Math.round((map.current.getZoom() / 23) * 8 + 2));
+
+      cells.push(
+        ...h3.polygonToCells(
+          viewCoords,
+          8,
+          // Math.round((map.current.getZoom() / 23) * 8 + 2),
+          false,
+        ),
+      );
+    } else {
+      cells.push(...Object.keys(selectedHexagons));
+    }
+
+    console.log('Cells:', cells.length);
+    console.log(cells);
+
+    for (const cell of cells) {
+      const boundary = h3.cellToBoundary(cell);
+
       const polygon = new ymaps.Polygon(
-        [hexagon.boundary],
-        { id: hexagon.cellId, hintContent: hexagon.cellId },
+        [boundary],
+        { id: cell, hintContent: cell },
         {
           hasHint: true,
           openHintOnHover: true,
-          openEmptyHint: true,
-          fillColor: 'rgba(255,255,255,0)',
+          openEmptyHint: false,
+          fillColor:
+            currentHexagon.cellId === cell
+              ? '#80FF60C7'
+              : cell in selectedHexagons
+                ? 'rgba(31,169,255,0.5)'
+                : 'rgba(255,255,255,0)',
           strokeColor: 'rgba(31,169,255,0.5)',
         },
       );
 
-      polygon.events.add('click', () => {
-        setCurrentHexagon(hexagon);
+      // polygon.events.add('mouseleave', (e) => {
+      //   const color = e.originalEvent.target.properties.get('id') in selectedHexagons
+      //   if (!()) {
+      //     e.originalEvent.target.options.set('fillColor', 'rgba(255,255,255, 0)');
+      //   }
+      // });
+      // polygon.events.add('hover', (e) => {
+      //   e.originalEvent.target.options.set('fillColor', 'rgba(140,255,110,0.42)');
+      // });
+
+      polygon.events.add('click', (e) => {
+        const cellId = e.originalEvent.target.properties.get('id');
+
+        if (isSelectingMode) {
+          if (cellId in selectedHexagons) {
+            delete selectedHexagons[cellId];
+
+            e.originalEvent.target.options.set('fillColor', 'rgb(255,255,255, 0)');
+          } else {
+            selectedHexagons[cellId] = true;
+
+            e.originalEvent.target.options.set('fillColor', '#80FF60C7');
+          }
+
+          setSelectedHexagons({ ...selectedHexagons });
+
+          console.log(selectedHexagons);
+        } else {
+          map.current.geoObjects.each((e) => {
+            e.options.set('fillColor', 'rgba(31,169,255,0.5)');
+          });
+          e.originalEvent.target.options.set('fillColor', '#80FF60C7');
+
+          setCurrentHexagon(hexagons.find((h) => h.cellId === cellId));
+        }
       });
 
       map.current.geoObjects.add(polygon);
     }
-  }, [map, isInitialized, hexagons]);
+  }, [map, isInitialized, hexagons, bounds, isSelectingMode]);
 
   useEffect(() => {
+    if (!currentHexagon) return;
+
     const dates = currentHexagon.weather.time.map((d) => new Date(d).getTime());
     setChartData({
       labels: dates,
@@ -307,6 +392,15 @@ export default function Index() {
         <div className="DataBlock2 p-3 shadow-lg">
           <div>
             <p className="text-xl font-bold">Настройки</p>
+          </div>
+          <div>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setSelectingMode(!isSelectingMode)}
+            >
+              {!isSelectingMode ? 'Выбрать территорию' : 'Подтвердить выбор'}
+            </button>
           </div>
           <div className="flex flex-row justify-start gap-2 py-2">
             <div className="w-1/2">

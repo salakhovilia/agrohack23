@@ -17,21 +17,8 @@ app = web.Application()
 async def get_polygons(request: web.Request):
     now = round(int(request.query.get('now')) / 1000)
 
-    x1 = float(request.query.get('x1'))
-    y1 = float(request.query.get('y1'))
-
-    x2 = float(request.query.get('x2'))
-    y2 = float(request.query.get('y2'))
-
-    view_coords = [
-        [x1, y1],
-        [x1, y2],
-        [x2, y2],
-        [x2, y1],
-    ]
-
-    cells = h3.polygon_to_cells(h3.Polygon(view_coords), 6)
-
+    cells = request.query.getall('ids[]')
+    
     map = []
 
     print('hexagons:', len(cells))
