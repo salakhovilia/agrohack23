@@ -60,16 +60,22 @@ async def get_polygons(request: web.Request):
             temps = data['hourly']["temperature_2m"]
             hums = data['hourly']["relative_humidity_2m"]
 
-            probs = get_illness_prob_for_each_timeunit(
-                none_satisf_weight=0.5,
-                partially_satisf_weight=2.0,
-                optimally_satisf_weight=6.0,
-                exp_growth_weight=1,
-                temps=temps,
-                hums=map_hums(hums),
-                illness_name=IllnessCase.BLACK_GNILL.name
-            )
-            hexagon['probs'] = probs
+            illnesses_enabled = False
+
+            if not illnesses_enabled:
+                hexagon['illnesses'] = {}
+                for illness in IllnessCase:
+                    probs = get_illness_prob_for_each_timeunit(
+                        none_satisf_weight=0.5,
+                        partially_satisf_weight=2.0,
+                        optimally_satisf_weight=6.0,
+                        exp_growth_weight=1,
+                        temps=temps,
+                        hums=map_hums(hums),
+                        illness_name=illness.name
+                    )
+                    hexagon['illnesses'][illness.name] = {}
+                    hexagon['illnesses'][illness.name]['probs'] = probs
 
         map.append(hexagon)
 
@@ -80,10 +86,10 @@ app.add_routes([web.get('/polygons', get_polygons)])
 
 cors = aiohttp_cors.setup(app, defaults={
     "*": aiohttp_cors.ResourceOptions(
-            allow_credentials=True,
-            expose_headers="*",
-            allow_headers="*",
-        )
+        allow_credentials=True,
+        expose_headers="*",
+        allow_headers="*",
+    )
 })
 
 # Configure CORS on all routes.
@@ -91,4 +97,4 @@ for route in list(app.router.routes()):
     cors.add(route)
 
 if __name__ == '__main__':
-    web.run_app(app)
+    web.run_app(app, port=3456)
