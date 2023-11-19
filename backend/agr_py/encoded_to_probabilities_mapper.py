@@ -2,21 +2,21 @@ import math
 
 from incub_period import UnknownIncubPeriod, IncubPeriod
 from illness_cases_spec import IllnessCase
-from raw_data_to_cases_mapper import IllnessDays, IllnessDayEnc
+from raw_data_to_cases_mapper import IllnessDays, IllnessConditEnc
 
 
 class WeightsProvider:
     def __init__(self, weight_map=None, lambda_factor=None):
         if weight_map is None:
-            weight_map = {IllnessDayEnc.NONE_CONDITION_SATISF: 0.5,
-                          IllnessDayEnc.START_CONDITION_SATISF: 1,
-                          IllnessDayEnc.OPTIMAL_CONDITION_SATISF: 3}
+            weight_map = {IllnessConditEnc.NONE_CONDITION_SATISF: 0.5,
+                          IllnessConditEnc.START_CONDITION_SATISF: 1,
+                          IllnessConditEnc.OPTIMAL_CONDITION_SATISF: 3}
         if lambda_factor is None:
             lambda_factor = 0.1
         self.weight_map = weight_map
         self.lambda_factor = lambda_factor
 
-    def get_weight(self, illness_case: IllnessDayEnc):
+    def get_weight(self, illness_case: IllnessConditEnc):
         return self.weight_map[illness_case]
 
     def get_exponential_growth_factor(self) -> float:
@@ -24,9 +24,9 @@ class WeightsProvider:
 
 
 def normalize_weighted_average(value: float, illnessDayEncWeightProvider: WeightsProvider) -> float:
-    min_value = illnessDayEncWeightProvider.get_weight(IllnessDayEnc.NONE_CONDITION_SATISF)
+    min_value = illnessDayEncWeightProvider.get_weight(IllnessConditEnc.NONE_CONDITION_SATISF)
     return (value - min_value) / (
-            illnessDayEncWeightProvider.get_weight(IllnessDayEnc.OPTIMAL_CONDITION_SATISF) - min_value)
+            illnessDayEncWeightProvider.get_weight(IllnessConditEnc.OPTIMAL_CONDITION_SATISF) - min_value)
 
 
 class IllnessProbabilities():
@@ -58,7 +58,7 @@ class PeriodValuesProvider():
 
 
 class SlidingWindowIncubPeriodAccumulator:
-    def __init__(self, illness: IllnessCase, encoded_values: list[IllnessDayEnc],
+    def __init__(self, illness: IllnessCase, encoded_values: list[IllnessConditEnc],
                  period_values_provider: PeriodValuesProvider,
                  weights_provider: WeightsProvider
                  ):
@@ -85,7 +85,12 @@ class SlidingWindowIncubPeriodAccumulator:
     def get_incub_period(self):
         return self.period_values_provider.get_incub_period_in_time_unit(self.illness.incub_period)
 
-    def map(self) -> list[float] | list[IllnessDayEnc]:
+    def is_applicable(self):
+        if isinstance(self.illness.incub_period, UnknownIncubPeriod):
+            return False
+        return True
+
+    def map(self) -> list[float] | list[IllnessConditEnc]:
         if isinstance(self.illness.incub_period, UnknownIncubPeriod):
             return self.prev_stage_values
 
@@ -118,13 +123,13 @@ def map_encoded_to_probabilities(illness_days: IllnessDays) -> IllnessProbabilit
 class ForTargetDateWeightedExponentialAccumulator():
     def __init__(self,
                  illness: IllnessCase,
-                 encoded_values: list[IllnessDayEnc],
+                 encoded_values: list[IllnessConditEnc],
                  illness_day_enc_weight_provider: WeightsProvider):
         self.illness = illness
         self.encoded_values = encoded_values
         self.weights_provider = illness_day_enc_weight_provider
 
-    def get_weighted_value(self, value: IllnessDayEnc, index: int) -> float:
+    def get_weighted_value(self, value: IllnessConditEnc, index: int) -> float:
         total_length = len(self.encoded_values)
 
         base_weight = self.weights_provider.get_weight(illness_case=value)

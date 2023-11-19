@@ -1,10 +1,9 @@
-from encoded_to_probabilities_mapper import PeriodValuesProvider, SlidingWindowIncubPeriodAccumulator, \
-    normalize_weighted_average, WeightsProvider
+from encoded_to_probabilities_mapper import PeriodValuesProvider, SlidingWindowIncubPeriodAccumulator, WeightsProvider
 from illness_optimal import IllnessOptimal, WellDefinedIllnessOptimal
 from illness_start import AbsIllnessStart, IllnessStart
 from incub_period import IncubPeriod, HourIncubPeriod, UnknownIncubPeriod
 from preserv_duration import PreservDuration, ConcretePreservDuration
-from raw_data_to_cases_mapper import illn_none, illn_optimal, illn_start
+from raw_data_to_cases_mapper import illn_optimal, illn_start, illn_none
 
 periodValuesProvider = PeriodValuesProvider(use_hours=True)
 
