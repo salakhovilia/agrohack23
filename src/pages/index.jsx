@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import Datepicker from 'react-tailwindcss-datepicker';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
 import { Chart } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import 'chartjs-adapter-moment';
 import { ru } from 'date-fns/locale';
 import * as h3 from 'h3-js';
+import throttle from 'lodash.throttle';
 
 ChartJS.register(...registerables);
 
@@ -13,10 +15,7 @@ export default function Index() {
   const container = useRef(null);
   const map = useRef(null);
 
-  const [date, setDate] = useState({
-    startDate: new Date('2021-05-15'),
-    endDate: new Date('2021-05-15'),
-  });
+  const [date, setDate] = useState(new Date('2021-08-13'));
 
   const [coords] = useState([44.80718242462311, 37.62550179278068]);
   const [zoom] = useState(11);
@@ -30,6 +29,10 @@ export default function Index() {
       ? JSON.parse(localStorage.getItem('selectedHexagons'))
       : {},
   );
+
+  const throttledAPICall = throttle(() => {
+    fetchData();
+  }, 1000);
 
   const [hexagons, setHexagons] = useState([]);
   const [currentHexagon, setCurrentHexagon] = useState({
@@ -46,7 +49,7 @@ export default function Index() {
       .get('/polygons', {
         baseURL: 'http://localhost:8080',
         params: {
-          now: new Date('2021-05-02').getTime(),
+          now: date.getTime(),
           ids: Object.keys(selectedHexagons),
         },
       })
@@ -70,7 +73,7 @@ export default function Index() {
 
     setIsInitialized(true);
 
-    fetchData();
+    throttledAPICall();
   };
 
   useEffect(() => {
@@ -78,13 +81,13 @@ export default function Index() {
   }, []);
 
   useEffect(() => {
-    fetchData();
+    throttledAPICall();
   }, [date]);
 
   useEffect(() => {
     if (isSelectingMode) return;
 
-    fetchData();
+    throttledAPICall();
   }, [isSelectingMode]);
 
   useEffect(() => {
@@ -100,14 +103,6 @@ export default function Index() {
 
     const cells = [];
     if (isSelectingMode) {
-      // const viewCoords = [
-      //   [44.94645256897698, 37.29703876822711],
-      //   [44.65134306217837, 37.29703876822711],
-      //   [44.65134306217837, 37.94715169000219],
-      //   [44.94645256897698, 37.94715169000219],
-      //   [44.94645256897698, 37.29703876822711],
-      // ];
-
       const localBounds = map.current.getBounds();
 
       const viewCoords = [
@@ -135,6 +130,16 @@ export default function Index() {
     console.log(cells);
 
     for (const cell of cells) {
+      // const isBreak = map.current.geoObjects.each((o) => {
+      //   if (cell.cellId === o.properties.get('id')) {
+      //     return false;
+      //   }
+      // });
+      //
+      // if (!isBreak) {
+      //   continue;
+      // }
+
       const boundary = h3.cellToBoundary(cell);
 
       const polygon = new ymaps.Polygon(
@@ -171,7 +176,7 @@ export default function Index() {
           if (cellId in selectedHexagons) {
             delete selectedHexagons[cellId];
 
-            e.originalEvent.target.options.set('fillColor', 'rgb(255,255,255, 0)');
+            e.originalEvent.target.options.set('fillColor', 'rgba(255,255,255, 0)');
           } else {
             selectedHexagons[cellId] = true;
 
@@ -407,13 +412,7 @@ export default function Index() {
               <p className="text-md">Сегодня: </p>
             </div>
             <div className="w-1/2">
-              <Datepicker
-                asSingle={true}
-                useRange={false}
-                value={date}
-                inputClassName="p-2 h-6 rounded bg-gray-200"
-                onChange={setDate}
-              />
+              <DatePicker selected={date} onChange={(date) => setDate(date)} />
             </div>
           </div>
           <div className="flex flex-row justify-between gap-4">
