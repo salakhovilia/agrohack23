@@ -1,10 +1,9 @@
-from encoded_to_probabilities_mapper import PeriodValuesProvider, SlidingWindowIncubPeriodAccumulator, \
-    normalize_weighted_average
+from encoded_to_probabilities_mapper import PeriodValuesProvider, SlidingWindowIncubPeriodAccumulator, WeightsProvider
 from illness_optimal import IllnessOptimal, WellDefinedIllnessOptimal
 from illness_start import AbsIllnessStart, IllnessStart
 from incub_period import IncubPeriod, HourIncubPeriod, UnknownIncubPeriod
 from preserv_duration import PreservDuration, ConcretePreservDuration
-from raw_data_to_cases_mapper import illn_none, illn_optimal, illn_start
+from raw_data_to_cases_mapper import illn_optimal, illn_start, illn_none
 
 periodValuesProvider = PeriodValuesProvider(use_hours=True)
 
@@ -59,7 +58,8 @@ encoded_values_5 = [
 slidingWindowIncubAccumulator5 = SlidingWindowIncubPeriodAccumulator(
     illness=illness_mock_5,
     encoded_values=encoded_values_5,
-    period_values_provider=periodValuesProvider
+    period_values_provider=periodValuesProvider,
+    weights_provider=WeightsProvider()
 )
 
 
@@ -96,7 +96,8 @@ def test_accumulator_correctly_aggregates():
     slidingWindowIncubAccumulator2 = SlidingWindowIncubPeriodAccumulator(
         illness=illness_mock_2,
         encoded_values=encoded_values_2,
-        period_values_provider=periodValuesProvider
+        period_values_provider=periodValuesProvider,
+        weights_provider=WeightsProvider()
     )
     mapped = slidingWindowIncubAccumulator2.map()
 
@@ -113,7 +114,8 @@ def test_doesnt_calc_for_non_incub_illness():
             UnknownIncubPeriod(),
         ),
         encoded_values=enc_values,
-        period_values_provider=periodValuesProvider
+        period_values_provider=periodValuesProvider,
+        weights_provider=WeightsProvider()
     )
     mapped = slidingWindowIncubAccumulator2.map()
 

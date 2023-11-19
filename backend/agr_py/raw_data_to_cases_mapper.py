@@ -3,25 +3,25 @@ from weather import Weather, WeatherData
 from enum import Enum
 
 
-class IllnessDayEnc(Enum):
+class IllnessConditEnc(Enum):
     NONE_CONDITION_SATISF = 0
     START_CONDITION_SATISF = 1
     OPTIMAL_CONDITION_SATISF = 2
 
 
 def illn_none():
-    return IllnessDayEnc.NONE_CONDITION_SATISF
+    return IllnessConditEnc.NONE_CONDITION_SATISF
 
 
 def illn_start():
-    return IllnessDayEnc.START_CONDITION_SATISF
+    return IllnessConditEnc.START_CONDITION_SATISF
 
 
 def illn_optimal():
-    return IllnessDayEnc.OPTIMAL_CONDITION_SATISF
+    return IllnessConditEnc.OPTIMAL_CONDITION_SATISF
 
 
-illness_historic_data = list[IllnessDayEnc]
+illness_historic_data = list[IllnessConditEnc]
 
 
 class IllnessEntry:
@@ -30,13 +30,13 @@ class IllnessEntry:
         self.illness_days_enc: illness_historic_data = []
 
     def add_start_condition_satisfied(self):
-        self.illness_days_enc.append(IllnessDayEnc.START_CONDITION_SATISF)
+        self.illness_days_enc.append(IllnessConditEnc.START_CONDITION_SATISF)
 
     def add_optimal_condition_satisfied(self):
-        self.illness_days_enc.append(IllnessDayEnc.OPTIMAL_CONDITION_SATISF)
+        self.illness_days_enc.append(IllnessConditEnc.OPTIMAL_CONDITION_SATISF)
 
     def add_none_condition_satisfied(self):
-        self.illness_days_enc.append(IllnessDayEnc.NONE_CONDITION_SATISF)
+        self.illness_days_enc.append(IllnessConditEnc.NONE_CONDITION_SATISF)
 
 
 class HistoryContext():
@@ -64,7 +64,7 @@ class IllnessDays:
         return self.illness_to_historic_data[illness]
 
 
-def map_single_time_weather_to_illnesses_days(
+def map_single_time_weather_to_illnesses_enc(
         weather: Weather,
         history: HistoryContext,
 ):
@@ -80,14 +80,14 @@ def map_single_time_weather_to_illnesses_days(
 
 
 def map_weather_to_historic_data(
-        dayly_temps: list[float],
-        dayly_hum: list[float]
+        temps: list[float],
+        hums: list[float]
 ) -> IllnessDays:
     history_context = HistoryContext()
 
-    for temp, hum in zip(dayly_temps, dayly_hum):
+    for temp, hum in zip(temps, hums):
         weather = WeatherData(temp=temp, hum=hum)
-        map_single_time_weather_to_illnesses_days(
+        map_single_time_weather_to_illnesses_enc(
             weather=weather,
             history=history_context
         )

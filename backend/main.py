@@ -6,6 +6,9 @@ import aiohttp_cors
 import h3
 from aiohttp import web
 
+from algo_client import get_illness_prob_for_each_timeunit, map_hums
+from illness_cases_spec import IllnessCase
+
 url = "https://archive-api.open-meteo.com/v1/archive"
 
 app = web.Application()
@@ -53,6 +56,20 @@ async def get_polygons(request: web.Request):
                 print('skip', json.dumps(params))
                 continue
             hexagon['weather'] = data['hourly']
+
+            temps = data['hourly']["temperature_2m"]
+            hums = data['hourly']["relative_humidity_2m"]
+
+            probs = get_illness_prob_for_each_timeunit(
+                none_satisf_weight=0.5,
+                partially_satisf_weight=1.0,
+                optimally_satisf_weight=3.0,
+                exp_growth_weight=0.1,
+                temps=temps,
+                hums=map_hums(hums),
+                illness_name=IllnessCase.BLACK_GNILL.name
+            )
+            hexagon['probs'] = probs
 
         map.append(hexagon)
 
