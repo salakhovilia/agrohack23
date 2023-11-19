@@ -31,6 +31,10 @@ def get_illness_prob_for_each_timeunit_def(
     )
 
 
+def map_hums(source_hums: list[float]) -> list[float]:
+    return list(map(lambda hum: hum / 100.0, source_hums))
+
+
 def get_illness_prob_for_each_timeunit(none_satisf_weight: float,
                                        partially_satisf_weight: float,
                                        optimally_satisf_weight: float,
