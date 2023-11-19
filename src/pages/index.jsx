@@ -196,6 +196,8 @@ export default function Index() {
   }, [map, isInitialized, hexagons, bounds, isSelectingMode]);
 
   useEffect(() => {
+    if (!currentHexagon) return;
+
     const dates = currentHexagon.weather.time.map((d) => new Date(d).getTime());
     setChartData({
       labels: dates,
