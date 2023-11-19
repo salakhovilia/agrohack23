@@ -3,6 +3,8 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import axios from 'axios';
 import { Chart } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
+import 'chartjs-adapter-moment';
+import { ru } from 'date-fns/locale';
 
 ChartJS.register(...registerables);
 
@@ -111,8 +113,9 @@ export default function Index() {
   }, [map, isInitialized, hexagons]);
 
   useEffect(() => {
+    const dates = currentHexagon.weather.time.map((d) => new Date(d).getTime());
     setChartData({
-      labels: currentHexagon.weather.time,
+      labels: dates,
       datasets: [
         {
           type: 'line',
@@ -122,6 +125,7 @@ export default function Index() {
           borderWidth: 2,
           pointStyle: false,
           data: currentHexagon.weather.temperature_2m,
+          xAxisId: 'x',
           yAxisID: 'y',
         },
         {
@@ -131,6 +135,7 @@ export default function Index() {
           borderColor: 'rgb(75, 192, 192)',
           data: currentHexagon.weather.rain,
           borderWidth: 2,
+          xAxisId: 'x',
           yAxisID: 'y1',
         },
         {
@@ -140,6 +145,7 @@ export default function Index() {
           backgroundColor: 'rgb(53, 162, 235)',
           data: currentHexagon.weather.relative_humidity_2m,
           pointStyle: false,
+          xAxisId: 'x',
           yAxisID: 'y2',
         },
       ],
@@ -161,6 +167,14 @@ export default function Index() {
               responsive: true,
               maintainAspectRatio: false,
               scales: {
+                x: {
+                  type: 'time',
+                  adapters: {
+                    date: {
+                      locale: ru,
+                    },
+                  },
+                },
                 y: {
                   type: 'linear',
                   display: true,
@@ -181,27 +195,12 @@ export default function Index() {
           />
         </div>
 
-        <div className="CurrentWeather shadow-lg">
-          <h2 className="text-xl font-bold">Погода в Анапе</h2>
-        </div>
+        {/*<div className="CurrentWeather shadow-lg">*/}
+        {/*  <h2 className="text-xl font-bold">Погода в Анапе</h2>*/}
+        {/*</div>*/}
 
         <div className="DataBlock1 p-3 shadow-lg">
           <div className="flew-col flex flex-wrap">
-            <div className="flex flex-row justify-between gap-2 pl-2">
-              <div>
-                <p className="text-md">Сегодня: </p>
-              </div>
-              <div>
-                <Datepicker
-                  asSingle={true}
-                  useRange={false}
-                  startFrom={new Date('2021-04-01')}
-                  value={date}
-                  inputClassName="p-2 h-6 rounded"
-                  onChange={setDate}
-                />
-              </div>
-            </div>
             {/* Таблица показателей */}
             <div className="overflow-x-auto">
               <table className="table table-xs">
@@ -308,6 +307,20 @@ export default function Index() {
         <div className="DataBlock2 p-3 shadow-lg">
           <div>
             <p className="text-xl font-bold">Настройки</p>
+          </div>
+          <div className="flex flex-row justify-start gap-2 py-2">
+            <div className="w-1/2">
+              <p className="text-md">Сегодня: </p>
+            </div>
+            <div className="w-1/2">
+              <Datepicker
+                asSingle={true}
+                useRange={false}
+                value={date}
+                inputClassName="p-2 h-6 rounded bg-gray-200"
+                onChange={setDate}
+              />
+            </div>
           </div>
           <div className="flex flex-row justify-between gap-4">
             <div className="flex w-1/2 flex-col gap-2">

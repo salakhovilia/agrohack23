@@ -16,7 +16,7 @@ html, body {
     "DataBlock1 MAP MAP"
     "DataBlock2 MAP MAP"
     "DataBlock2 TimeGraphs TimeGraphs"
-    "CurrentWeather TimeGraphs TimeGraphs";
+    "DataBlock2 TimeGraphs TimeGraphs";
 }
 
 .MAP { grid-area: MAP; }
