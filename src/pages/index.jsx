@@ -38,6 +38,7 @@ export default function Index() {
   const [currentHexagon, setCurrentHexagon] = useState({
     center: [0, 0],
     weather: { time: [], temperature_2m: [], rain: [], relative_humidity_2m: [] },
+    illnesses: [],
   });
 
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
@@ -96,6 +97,21 @@ export default function Index() {
 
   const [bounds, setBounds] = useState([]);
 
+  const getColor = (hex) => {
+    let color = 'rgba(31,169,255,0.5)';
+
+    if (hex) {
+      for (const illnessKey of Object.keys(hex.illnesses)) {
+        if (hex.illnesses[illnessKey].probs[hex.illnesses[illnessKey].probs.length - 1] > 0.5) {
+          color = 'rgba(203,51,51,0.76)';
+          break;
+        }
+      }
+    }
+
+    return color;
+  };
+
   useEffect(() => {
     if (!map.current) return;
 
@@ -142,6 +158,13 @@ export default function Index() {
 
       const boundary = h3.cellToBoundary(cell);
 
+      const hex = hexagons.find((h) => h.cellId === cell);
+
+      let color = getColor(hex);
+      if (currentHexagon.cellId === cell) {
+        color = '#80FF60C7';
+      }
+
       const polygon = new ymaps.Polygon(
         [boundary],
         { id: cell, hintContent: cell },
@@ -149,12 +172,7 @@ export default function Index() {
           hasHint: true,
           openHintOnHover: true,
           openEmptyHint: false,
-          fillColor:
-            currentHexagon.cellId === cell
-              ? '#80FF60C7'
-              : cell in selectedHexagons
-                ? 'rgba(31,169,255,0.5)'
-                : 'rgba(255,255,255,0)',
+          fillColor: color,
           strokeColor: 'rgba(31,169,255,0.5)',
         },
       );
@@ -187,12 +205,17 @@ export default function Index() {
 
           console.log(selectedHexagons);
         } else {
+          const hex = hexagons.find((h) => h.cellId === cellId);
           map.current.geoObjects.each((e) => {
-            e.options.set('fillColor', 'rgba(31,169,255,0.5)');
+            console.log(e.properties.get('id'), currentHexagon.cellId);
+            if (e.properties.get('id') === currentHexagon.cellId) {
+              e.options.set('fillColor', 'rgba(31,169,255,0.5)');
+            }
           });
           e.originalEvent.target.options.set('fillColor', '#80FF60C7');
 
-          setCurrentHexagon(hexagons.find((h) => h.cellId === cellId));
+          setCurrentHexagon(hex);
+          console.log(currentHexagon);
         }
       });
 
@@ -238,6 +261,16 @@ export default function Index() {
           xAxisId: 'x',
           yAxisID: 'y2',
         },
+        // {
+        //   type: 'line',
+        //   label: 'Black gnil',
+        //   borderColor: 'rgb(5, 5, 4)',
+        //   backgroundColor: 'rgb(5, 5, 4)',
+        //   data: currentHexagon.probs,
+        //   pointStyle: false,
+        //   xAxisId: 'x',
+        //   yAxisID: 'y3',
+        // },
       ],
     });
   }, [currentHexagon]);
@@ -280,6 +313,11 @@ export default function Index() {
                   display: false,
                   position: 'right',
                 },
+                y3: {
+                  type: 'linear',
+                  display: false,
+                  position: 'right',
+                },
               },
             }}
           />
@@ -299,94 +337,213 @@ export default function Index() {
                   <tr>
                     <th>Заболевание</th>
                     <th>Вероятность</th>
-                    <th>Тренд Шанса (?)</th>
-                    <th>Через дней (?)</th>
+                    <th>Тренд</th>
                   </tr>
                 </thead>
                 <tbody>
                   {/* row 1 */}
                   <tr>
                     <td>Милдью</td>
-                    <td>15%</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['MILDEW']?.probs &&
+                      currentHexagon?.illnesses['MILDEW']?.probs.length
+                        ? Math.round(
+                            currentHexagon?.illnesses['MILDEW'].probs[
+                              currentHexagon?.illnesses['MILDEW'].probs.length - 1
+                            ] * 100,
+                          )
+                        : 0}
+                      %
+                    </td>
                     <td>⬆️⬇️</td>
-                    <td>3</td>
                   </tr>
                   {/* row 2 */}
                   <tr>
                     <td>Оидиум</td>
-                    <td>0%</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['OIDIUM']?.probs &&
+                      currentHexagon?.illnesses['OIDIUM']?.probs.length
+                        ? Math.round(
+                            currentHexagon?.illnesses['OIDIUM'].probs[
+                              currentHexagon?.illnesses['OIDIUM'].probs.length - 1
+                            ] * 100,
+                          )
+                        : 0}
+                      %
+                    </td>
                     <td>⬆️⬇️</td>
-                    <td>3</td>
                   </tr>
                   {/* row 3 */}
                   <tr>
                     <td>Антракноз</td>
-                    <td>7%</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['ANTRACNOS']?.probs &&
+                      currentHexagon?.illnesses['ANTRACNOS']?.probs.length
+                        ? Math.round(
+                            currentHexagon?.illnesses['ANTRACNOS'].probs[
+                              currentHexagon?.illnesses['ANTRACNOS'].probs.length - 1
+                            ] * 100,
+                          )
+                        : 0}
+                      %
+                    </td>
                     <td>⬆️⬇️</td>
-                    <td>3</td>
                   </tr>
                   {/* row 4 */}
                   <tr>
                     <td>Серая гниль</td>
-                    <td>7%</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['GRAY_GNILL']?.probs &&
+                      currentHexagon?.illnesses['GRAY_GNILL']?.probs.length
+                        ? Math.round(
+                            currentHexagon?.illnesses['GRAY_GNILL'].probs[
+                              currentHexagon?.illnesses['GRAY_GNILL'].probs.length - 1
+                            ] * 100,
+                          )
+                        : 0}
+                      %
+                    </td>
                     <td>⬆️⬇️</td>
-                    <td>3</td>
                   </tr>
                   {/* row 5 */}
                   <tr>
                     <td>Чёрная пятнистость</td>
-                    <td>7%</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['BLACK_PYATNISTS']?.probs &&
+                      currentHexagon?.illnesses['BLACK_PYATNISTS']?.probs.length
+                        ? Math.round(
+                            currentHexagon?.illnesses['BLACK_PYATNISTS'].probs[
+                              currentHexagon?.illnesses['BLACK_PYATNISTS'].probs.length - 1
+                            ] * 100,
+                          )
+                        : 0}
+                      %
+                    </td>
                     <td>⬆️⬇️</td>
-                    <td>3</td>
                   </tr>
                   {/* row 6 */}
                   <tr>
                     <td>Чёрная гниль</td>
-                    <td>7%</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['BLACK_GNILL']?.probs &&
+                      currentHexagon?.illnesses['BLACK_GNILL']?.probs.length
+                        ? Math.round(
+                            currentHexagon?.illnesses['BLACK_GNILL'].probs[
+                              currentHexagon?.illnesses['BLACK_GNILL'].probs.length - 1
+                            ] * 100,
+                          )
+                        : 0}
+                      %
+                    </td>
                     <td>⬆️⬇️</td>
-                    <td>3</td>
                   </tr>
                   {/* row 7 */}
                   <tr>
                     <td>Белая гниль</td>
-                    <td>7%</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['WHITE_GNILL']?.probs &&
+                      currentHexagon?.illnesses['WHITE_GNILL']?.probs.length
+                        ? Math.round(
+                            currentHexagon?.illnesses['WHITE_GNILL'].probs[
+                              currentHexagon?.illnesses['WHITE_GNILL'].probs.length - 1
+                            ] * 100,
+                          )
+                        : 0}
+                      %
+                    </td>
                     <td>⬆️⬇️</td>
-                    <td>3</td>
                   </tr>
                   {/* row 8 */}
                   <tr>
                     <td>Вертициллезное увядание</td>
-                    <td>7%</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['VILT']?.probs &&
+                      currentHexagon?.illnesses['VILT']?.probs.length
+                        ? Math.round(
+                            currentHexagon?.illnesses['VILT'].probs[
+                              currentHexagon?.illnesses['VILT'].probs.length - 1
+                            ] * 100,
+                          )
+                        : 0}
+                      %
+                    </td>
                     <td>⬆️⬇️</td>
-                    <td>3</td>
                   </tr>
                   {/* row 9 */}
                   <tr>
                     <td>Альтернариоз</td>
-                    <td>7%</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['ALTERNARIOZ']?.probs &&
+                      currentHexagon?.illnesses['ALTERNARIOZ']?.probs.length
+                        ? Math.round(
+                            currentHexagon?.illnesses['ALTERNARIOZ'].probs[
+                              currentHexagon?.illnesses['ALTERNARIOZ'].probs.length - 1
+                            ] * 100,
+                          )
+                        : 0}
+                      %
+                    </td>
                     <td>⬆️⬇️</td>
-                    <td>3</td>
                   </tr>
                   {/* row 10 */}
                   <tr>
                     <td>Фузариоз</td>
-                    <td>7%</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['FUZARIOZ']?.probs &&
+                      currentHexagon?.illnesses['FUZARIOZ']?.probs.length
+                        ? Math.round(
+                            currentHexagon?.illnesses['FUZARIOZ'].probs[
+                              currentHexagon?.illnesses['FUZARIOZ'].probs.length - 1
+                            ] * 100,
+                          )
+                        : 0}
+                      %
+                    </td>
                     <td>⬆️⬇️</td>
-                    <td>3</td>
                   </tr>
                   {/* row 11 */}
                   <tr>
                     <td>Краснуха</td>
-                    <td>7%</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['KRASNUHA']?.probs &&
+                      currentHexagon?.illnesses['KRASNUHA']?.probs.length
+                        ? Math.round(
+                            currentHexagon?.illnesses['KRASNUHA'].probs[
+                              currentHexagon?.illnesses['KRASNUHA'].probs.length - 1
+                            ] * 100,
+                          )
+                        : 0}
+                      %
+                    </td>
                     <td>⬆️⬇️</td>
-                    <td>3</td>
                   </tr>
                   {/* row 12 */}
                   <tr>
                     <td>Бактериальный рак</td>
-                    <td>7%</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['BACT_CANCER']?.probs &&
+                      currentHexagon?.illnesses['BACT_CANCER']?.probs.length
+                        ? Math.round(
+                            currentHexagon?.illnesses['BACT_CANCER'].probs[
+                              currentHexagon?.illnesses['BACT_CANCER'].probs.length - 1
+                            ] * 100,
+                          )
+                        : 0}
+                      %
+                    </td>
                     <td>⬆️⬇️</td>
-                    <td>3</td>
                   </tr>
                 </tbody>
               </table>

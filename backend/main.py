@@ -33,7 +33,7 @@ async def get_polygons(request: web.Request):
 
         end_date = datetime.datetime.fromtimestamp(now).date().isoformat()
         if datetime.datetime.now().timestamp() - now > 24 * 60 * 60:
-            end_date = datetime.datetime.fromtimestamp(now + 7 * 24 * 60 * 60).date().isoformat()
+            end_date = datetime.datetime.fromtimestamp(now + 3 * 24 * 60 * 60).date().isoformat()
         else:
             forecast_start = now
             forecast_end = now + 7 * 24 * 60 * 60
@@ -97,4 +97,4 @@ for route in list(app.router.routes()):
     cors.add(route)
 
 if __name__ == '__main__':
-    web.run_app(app, port=3456)
+    web.run_app(app)
