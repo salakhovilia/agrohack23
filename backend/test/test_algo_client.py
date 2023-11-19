@@ -1,6 +1,6 @@
 import json
 
-from algo_client import get_illness_prob_for_each_timeunit, get_illness_prob_for_each_timeunit_def
+from algo_client import get_illness_prob_for_each_timeunit_def
 from illness_cases_spec import IllnessCase
 
 file_path = 'test_response_hourly.json'

@@ -1,5 +1,5 @@
-from agr_py.encoded_to_probabilities_mapper import ForTargetDateWeightedExponentialAccumulator, WeightsProvider
-from agr_py.illness_optimal import WellDefinedIllnessOptimal
+from encoded_to_probabilities_mapper import ForTargetDateWeightedExponentialAccumulator, WeightsProvider
+from illness_optimal import WellDefinedIllnessOptimal
 from illness_start import IllnessStart
 from incub_period import HourIncubPeriod
 from preserv_duration import ConcretePreservDuration

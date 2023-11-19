@@ -18,7 +18,7 @@ async def get_polygons(request: web.Request):
     now = round(int(request.query.get('now')) / 1000)
 
     cells = request.query.getall('ids[]')
-    
+
     map = []
 
     print('hexagons:', len(cells))
@@ -60,16 +60,16 @@ async def get_polygons(request: web.Request):
             temps = data['hourly']["temperature_2m"]
             hums = data['hourly']["relative_humidity_2m"]
 
-            probs = get_illness_prob_for_each_timeunit(
-                none_satisf_weight=0.5,
-                partially_satisf_weight=2.0,
-                optimally_satisf_weight=6.0,
-                exp_growth_weight=1,
-                temps=temps,
-                hums=map_hums(hums),
-                illness_name=IllnessCase.BLACK_GNILL.name
-            )
-            hexagon['probs'] = probs
+            # probs = get_illness_prob_for_each_timeunit(
+            #     none_satisf_weight=0.5,
+            #     partially_satisf_weight=2.0,
+            #     optimally_satisf_weight=6.0,
+            #     exp_growth_weight=1,
+            #     temps=temps,
+            #     hums=map_hums(hums),
+            #     illness_name=IllnessCase.BLACK_GNILL.name
+            # )
+            hexagon['probs'] = []
 
         map.append(hexagon)
 

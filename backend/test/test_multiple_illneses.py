@@ -1,5 +1,5 @@
-from agr_py.illness_cases_spec import IllnessCase
-from agr_py.raw_data_to_cases_mapper import map_weather_to_historic_data, IllnessConditEnc
+from illness_cases_spec import IllnessCase
+from raw_data_to_cases_mapper import map_weather_to_historic_data, IllnessConditEnc
 
 common_temps = [14, 17, 15, 19, 25]
 common_hums = [0.56, 0.80, 0.89, 0.45, 0.8]
