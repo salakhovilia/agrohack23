@@ -88,24 +88,36 @@ def get_illness_prob_for_each_timeunit(none_satisf_weight: float,
         weights_provider=weight_provider
     )
 
-    if sliding_window_incub_period_acc.is_applicable():
-        sliding_window_acc_probs_normalized = sliding_window_incub_period_acc.map()
+    # todo commented out : problem if incub period is bigger than given data set
+    # if sliding_window_incub_period_acc.is_applicable():
+    #     sliding_window_acc_probs_normalized = sliding_window_incub_period_acc.map()
+    #
+    #     expon_weight_acc = EwmaAccumulator(
+    #         illness=illness,
+    #         encoded_values=sliding_window_acc_probs_normalized,
+    #         illness_day_enc_weight_provider=weight_provider,
+    #     )
+    #
+    #     expon_weights_mapped = expon_weight_acc.map()
+    #     return expon_weights_mapped
+    #
+    # else:
+    #     expon_weight_acc = EwmaAccumulator(
+    #         illness=illness,
+    #         encoded_values=normalized_weights,
+    #         illness_day_enc_weight_provider=weight_provider,
+    #     )
+    #
+    #     expon_weights_mapped = expon_weight_acc.map()
+    #     return expon_weights_mapped
 
-        expon_weight_acc = EwmaAccumulator(
-            illness=illness,
-            encoded_values=sliding_window_acc_probs_normalized,
-            illness_day_enc_weight_provider=weight_provider,
-        )
+    expon_weight_acc = EwmaAccumulator(
+        illness=illness,
+        encoded_values=normalized_weights,
+        illness_day_enc_weight_provider=weight_provider,
+    )
 
-        expon_weights_mapped = expon_weight_acc.map()
-        return expon_weights_mapped
+    expon_weights_mapped = expon_weight_acc.map()
+    return expon_weights_mapped
 
-    else:
-        expon_weight_acc = EwmaAccumulator(
-            illness=illness,
-            encoded_values=normalized_weights,
-            illness_day_enc_weight_provider=weight_provider,
-        )
 
-        expon_weights_mapped = expon_weight_acc.map()
-        return expon_weights_mapped

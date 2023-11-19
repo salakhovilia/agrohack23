@@ -1,6 +1,6 @@
 import json
 
-from algo_client import get_illness_prob_for_each_timeunit_def
+from algo_client import get_illness_prob_for_each_timeunit_def, map_hums, get_illness_prob_for_each_timeunit
 from illness_cases_spec import IllnessCase
 
 file_path = 'test_response_hourly.json'
@@ -41,3 +41,19 @@ def test_get_illness_prob_for_each_timeunit():
     print(probs)
 
     assert len(probs) > 0
+
+
+def test_multi():
+    temps, hums = get_temps_and_hums_hourly()
+
+    for illness in IllnessCase:
+        probs = get_illness_prob_for_each_timeunit(
+            none_satisf_weight=0.5,
+            partially_satisf_weight=2.0,
+            optimally_satisf_weight=6.0,
+            exp_growth_weight=1,
+            temps=temps,
+            hums=map_hums(hums),
+            illness_name=illness.name
+        )
+        print(probs)
