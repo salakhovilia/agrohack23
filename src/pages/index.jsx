@@ -356,7 +356,18 @@ export default function Index() {
                         : 0}
                       %
                     </td>
-                    <td>⬆️⬇️</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['MILDEW']?.probs &&
+                      currentHexagon?.illnesses['MILDEW']?.probs.length
+                        ? currentHexagon?.illnesses['MILDEW'].probs[
+                            currentHexagon?.illnesses['MILDEW'].probs.length - 1
+                          ] > currentHexagon?.illnesses['MILDEW'].probs[0]
+                          ? '⬆'
+                          : '⬇'
+                        : '-'}
+                      ️️
+                    </td>
                   </tr>
                   {/* row 2 */}
                   <tr>
@@ -373,7 +384,17 @@ export default function Index() {
                         : 0}
                       %
                     </td>
-                    <td>⬆️⬇️</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['OIDIUM']?.probs &&
+                      currentHexagon?.illnesses['OIDIUM']?.probs.length
+                        ? currentHexagon?.illnesses['OIDIUM'].probs[
+                            currentHexagon?.illnesses['OIDIUM'].probs.length - 1
+                          ] > currentHexagon?.illnesses['OIDIUM'].probs[0]
+                          ? '⬆'
+                          : '⬇'
+                        : '-'}
+                    </td>
                   </tr>
                   {/* row 3 */}
                   <tr>
@@ -390,7 +411,17 @@ export default function Index() {
                         : 0}
                       %
                     </td>
-                    <td>⬆️⬇️</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['ANTRACNOS']?.probs &&
+                      currentHexagon?.illnesses['ANTRACNOS']?.probs.length
+                        ? currentHexagon?.illnesses['ANTRACNOS'].probs[
+                            currentHexagon?.illnesses['ANTRACNOS'].probs.length - 1
+                          ] > currentHexagon?.illnesses['ANTRACNOS'].probs[0]
+                          ? '⬆'
+                          : '⬇'
+                        : '-'}
+                    </td>
                   </tr>
                   {/* row 4 */}
                   <tr>
@@ -407,7 +438,17 @@ export default function Index() {
                         : 0}
                       %
                     </td>
-                    <td>⬆️⬇️</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['GRAY_GNILL']?.probs &&
+                      currentHexagon?.illnesses['GRAY_GNILL']?.probs.length
+                        ? currentHexagon?.illnesses['GRAY_GNILL'].probs[
+                            currentHexagon?.illnesses['GRAY_GNILL'].probs.length - 1
+                          ] > currentHexagon?.illnesses['GRAY_GNILL'].probs[0]
+                          ? '⬆'
+                          : '⬇'
+                        : '-'}
+                    </td>
                   </tr>
                   {/* row 5 */}
                   <tr>
@@ -424,7 +465,17 @@ export default function Index() {
                         : 0}
                       %
                     </td>
-                    <td>⬆️⬇️</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['BLACK_PYATNISTS']?.probs &&
+                      currentHexagon?.illnesses['BLACK_PYATNISTS']?.probs.length
+                        ? currentHexagon?.illnesses['BLACK_PYATNISTS'].probs[
+                            currentHexagon?.illnesses['BLACK_PYATNISTS'].probs.length - 1
+                          ] > currentHexagon?.illnesses['BLACK_PYATNISTS'].probs[0]
+                          ? '⬆'
+                          : '⬇'
+                        : '-'}
+                    </td>
                   </tr>
                   {/* row 6 */}
                   <tr>
@@ -441,7 +492,17 @@ export default function Index() {
                         : 0}
                       %
                     </td>
-                    <td>⬆️⬇️</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['BLACK_GNILL']?.probs &&
+                      currentHexagon?.illnesses['BLACK_GNILL']?.probs.length
+                        ? currentHexagon?.illnesses['BLACK_GNILL'].probs[
+                            currentHexagon?.illnesses['BLACK_GNILL'].probs.length - 1
+                          ] > currentHexagon?.illnesses['BLACK_GNILL'].probs[0]
+                          ? '⬆'
+                          : '⬇'
+                        : '-'}
+                    </td>
                   </tr>
                   {/* row 7 */}
                   <tr>
@@ -458,7 +519,17 @@ export default function Index() {
                         : 0}
                       %
                     </td>
-                    <td>⬆️⬇️</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['WHITE_GNILL']?.probs &&
+                      currentHexagon?.illnesses['WHITE_GNILL']?.probs.length
+                        ? currentHexagon?.illnesses['WHITE_GNILL'].probs[
+                            currentHexagon?.illnesses['WHITE_GNILL'].probs.length - 1
+                          ] > currentHexagon?.illnesses['WHITE_GNILL'].probs[0]
+                          ? '⬆'
+                          : '⬇'
+                        : '-'}
+                    </td>
                   </tr>
                   {/* row 8 */}
                   <tr>
@@ -475,7 +546,17 @@ export default function Index() {
                         : 0}
                       %
                     </td>
-                    <td>⬆️⬇️</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['VILT']?.probs &&
+                      currentHexagon?.illnesses['VILT']?.probs.length
+                        ? currentHexagon?.illnesses['VILT'].probs[
+                            currentHexagon?.illnesses['VILT'].probs.length - 1
+                          ] > currentHexagon?.illnesses['VILT'].probs[0]
+                          ? '⬆'
+                          : '⬇'
+                        : '-'}
+                    </td>
                   </tr>
                   {/* row 9 */}
                   <tr>
@@ -492,7 +573,17 @@ export default function Index() {
                         : 0}
                       %
                     </td>
-                    <td>⬆️⬇️</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['ALTERNARIOZ']?.probs &&
+                      currentHexagon?.illnesses['ALTERNARIOZ']?.probs.length
+                        ? currentHexagon?.illnesses['ALTERNARIOZ'].probs[
+                            currentHexagon?.illnesses['ALTERNARIOZ'].probs.length - 1
+                          ] > currentHexagon?.illnesses['ALTERNARIOZ'].probs[0]
+                          ? '⬆'
+                          : '⬇'
+                        : '-'}
+                    </td>
                   </tr>
                   {/* row 10 */}
                   <tr>
@@ -509,7 +600,17 @@ export default function Index() {
                         : 0}
                       %
                     </td>
-                    <td>⬆️⬇️</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['FUZARIOZ']?.probs &&
+                      currentHexagon?.illnesses['FUZARIOZ']?.probs.length
+                        ? currentHexagon?.illnesses['FUZARIOZ'].probs[
+                            currentHexagon?.illnesses['FUZARIOZ'].probs.length - 1
+                          ] > currentHexagon?.illnesses['FUZARIOZ'].probs[0]
+                          ? '⬆'
+                          : '⬇'
+                        : '-'}
+                    </td>
                   </tr>
                   {/* row 11 */}
                   <tr>
@@ -526,7 +627,17 @@ export default function Index() {
                         : 0}
                       %
                     </td>
-                    <td>⬆️⬇️</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['KRASNUHA']?.probs &&
+                      currentHexagon?.illnesses['KRASNUHA']?.probs.length
+                        ? currentHexagon?.illnesses['KRASNUHA'].probs[
+                            currentHexagon?.illnesses['KRASNUHA'].probs.length - 1
+                          ] > currentHexagon?.illnesses['KRASNUHA'].probs[0]
+                          ? '⬆'
+                          : '⬇'
+                        : '-'}
+                    </td>
                   </tr>
                   {/* row 12 */}
                   <tr>
@@ -543,7 +654,17 @@ export default function Index() {
                         : 0}
                       %
                     </td>
-                    <td>⬆️⬇️</td>
+                    <td>
+                      {currentHexagon?.illnesses &&
+                      currentHexagon?.illnesses['BACT_CANCER']?.probs &&
+                      currentHexagon?.illnesses['BACT_CANCER']?.probs.length
+                        ? currentHexagon?.illnesses['BACT_CANCER'].probs[
+                            currentHexagon?.illnesses['BACT_CANCER'].probs.length - 1
+                          ] > currentHexagon?.illnesses['BACT_CANCER'].probs[0]
+                          ? '⬆'
+                          : '⬇'
+                        : '-'}
+                    </td>
                   </tr>
                 </tbody>
               </table>
