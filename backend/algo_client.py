@@ -15,14 +15,30 @@ def get_illness_encoded(temps: list[float],
     return json.dumps(encoded_data)
 
 
-def get_illness_prob_at_last_day(none_satisf_weight: float,
-                                 partially_satisf_weight: float,
-                                 optimally_satisf_weight: float,
-                                 exp_growth_weight: float,
-                                 temps: list[float],
-                                 hums: list[float],
-                                 illness_name: str,
-                                 ) -> list[float] | None:
+def get_illness_prob_for_each_timeunit_def(
+        temps: list[float],
+        hums: list[float],
+        illness_name: str,
+) -> list[float] | None:
+    return get_illness_prob_for_each_timeunit(
+        none_satisf_weight=0.5,
+        partially_satisf_weight=1.0,
+        optimally_satisf_weight=3.0,
+        exp_growth_weight=0.1,
+        temps=temps,
+        hums=hums,
+        illness_name=illness_name
+    )
+
+
+def get_illness_prob_for_each_timeunit(none_satisf_weight: float,
+                                       partially_satisf_weight: float,
+                                       optimally_satisf_weight: float,
+                                       exp_growth_weight: float,
+                                       temps: list[float],
+                                       hums: list[float],
+                                       illness_name: str,
+                                       ) -> list[float] | None:
     weight_provider = WeightsProvider(
         weight_map={
             IllnessConditEnc.NONE_CONDITION_SATISF: none_satisf_weight,
@@ -36,7 +52,7 @@ def get_illness_prob_at_last_day(none_satisf_weight: float,
 
     illness = None
     for i in IllnessCase:
-        if i == illness_name:
+        if i.name == illness_name:
             illness = i
 
     if illness is None:
