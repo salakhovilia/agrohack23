@@ -21,6 +21,11 @@ export default function Index() {
   const [isInitialized, setIsInitialized] = useState(false);
 
   const [hexagons, setHexagons] = useState([]);
+  const [currentHexagon, setCurrentHexagon] = useState({
+    center: [0, 0],
+    weather: { time: [], temperature_2m: [], rain: [], relative_humidity_2m: [] },
+  });
+
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
   const fetchData = () => {
@@ -98,52 +103,57 @@ export default function Index() {
       );
 
       polygon.events.add('click', () => {
-        setChartData({
-          labels: hexagon.weather.time,
-          datasets: [
-            {
-              type: 'line',
-              label: 'Temperature',
-              borderColor: 'rgb(255, 99, 132)',
-              backgroundColor: 'rgb(255, 99, 132)',
-              borderWidth: 2,
-              pointStyle: false,
-              data: hexagon.weather.temperature_2m,
-              yAxisID: 'y',
-            },
-            {
-              type: 'bar',
-              label: 'Rain',
-              backgroundColor: 'rgb(75, 192, 192)',
-              borderColor: 'rgb(75, 192, 192)',
-              data: hexagon.weather.rain,
-              borderWidth: 2,
-              yAxisID: 'y1',
-            },
-            {
-              type: 'line',
-              label: 'Humidity',
-              borderColor: 'rgb(53, 162, 235)',
-              backgroundColor: 'rgb(53, 162, 235)',
-              data: hexagon.weather.relative_humidity_2m,
-              pointStyle: false,
-              yAxisID: 'y2',
-            },
-          ],
-        });
+        setCurrentHexagon(hexagon);
       });
 
       map.current.geoObjects.add(polygon);
     }
   }, [map, isInitialized, hexagons]);
 
+  useEffect(() => {
+    setChartData({
+      labels: currentHexagon.weather.time,
+      datasets: [
+        {
+          type: 'line',
+          label: 'Temperature',
+          borderColor: 'rgb(255, 99, 132)',
+          backgroundColor: 'rgb(255, 99, 132)',
+          borderWidth: 2,
+          pointStyle: false,
+          data: currentHexagon.weather.temperature_2m,
+          yAxisID: 'y',
+        },
+        {
+          type: 'bar',
+          label: 'Rain',
+          backgroundColor: 'rgb(75, 192, 192)',
+          borderColor: 'rgb(75, 192, 192)',
+          data: currentHexagon.weather.rain,
+          borderWidth: 2,
+          yAxisID: 'y1',
+        },
+        {
+          type: 'line',
+          label: 'Humidity',
+          borderColor: 'rgb(53, 162, 235)',
+          backgroundColor: 'rgb(53, 162, 235)',
+          data: currentHexagon.weather.relative_humidity_2m,
+          pointStyle: false,
+          yAxisID: 'y2',
+        },
+      ],
+    });
+  }, [currentHexagon]);
+
   return (
     <>
-      <div className="area container grid h-full min-h-full w-full min-w-full grid-flow-row grid-cols-3 grid-rows-3 gap-4">
-        <div className="MAP">
+      <div className="area container grid h-full min-h-full w-full min-w-full grid-flow-row grid-cols-3 grid-rows-6 gap-3">
+        <div className="MAP shadow-lg">
           <div id="map" className="h-full w-full" ref={container} />
         </div>
-        <div className="TimeGraphs">
+
+        <div className="TimeGraphs p-3 shadow-lg">
           <Chart
             type="bar"
             data={chartData}
@@ -170,11 +180,173 @@ export default function Index() {
             }}
           />
         </div>
-        <div className="CurrentWeather">
-          <p>DCurrent Weather widget if we have time</p>
+
+        <div className="CurrentWeather shadow-lg">
+          <h2 className="text-xl font-bold">Погода в Анапе</h2>
         </div>
-        <div className="DataBlock">
-          <Datepicker asSingle={true} useRange={false} value={date} onChange={setDate} />
+
+        <div className="DataBlock1 p-3 shadow-lg">
+          <div className="flew-col flex flex-wrap">
+            <div className="flex flex-row justify-between gap-2 pl-2">
+              <div>
+                <p className="text-md">Сегодня: </p>
+              </div>
+              <div>
+                <Datepicker
+                  asSingle={true}
+                  useRange={false}
+                  startFrom={new Date('2021-04-01')}
+                  value={date}
+                  inputClassName="p-2 h-6 rounded"
+                  onChange={setDate}
+                />
+              </div>
+            </div>
+            {/* Таблица показателей */}
+            <div className="overflow-x-auto">
+              <table className="table table-xs">
+                {/* head */}
+                <thead>
+                  <tr>
+                    <th>Заболевание</th>
+                    <th>Вероятность</th>
+                    <th>Тренд Шанса (?)</th>
+                    <th>Через дней (?)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* row 1 */}
+                  <tr>
+                    <td>Милдью</td>
+                    <td>15%</td>
+                    <td>⬆️⬇️</td>
+                    <td>3</td>
+                  </tr>
+                  {/* row 2 */}
+                  <tr>
+                    <td>Оидиум</td>
+                    <td>0%</td>
+                    <td>⬆️⬇️</td>
+                    <td>3</td>
+                  </tr>
+                  {/* row 3 */}
+                  <tr>
+                    <td>Антракноз</td>
+                    <td>7%</td>
+                    <td>⬆️⬇️</td>
+                    <td>3</td>
+                  </tr>
+                  {/* row 4 */}
+                  <tr>
+                    <td>Серая гниль</td>
+                    <td>7%</td>
+                    <td>⬆️⬇️</td>
+                    <td>3</td>
+                  </tr>
+                  {/* row 5 */}
+                  <tr>
+                    <td>Чёрная пятнистость</td>
+                    <td>7%</td>
+                    <td>⬆️⬇️</td>
+                    <td>3</td>
+                  </tr>
+                  {/* row 6 */}
+                  <tr>
+                    <td>Чёрная гниль</td>
+                    <td>7%</td>
+                    <td>⬆️⬇️</td>
+                    <td>3</td>
+                  </tr>
+                  {/* row 7 */}
+                  <tr>
+                    <td>Белая гниль</td>
+                    <td>7%</td>
+                    <td>⬆️⬇️</td>
+                    <td>3</td>
+                  </tr>
+                  {/* row 8 */}
+                  <tr>
+                    <td>Вертициллезное увядание</td>
+                    <td>7%</td>
+                    <td>⬆️⬇️</td>
+                    <td>3</td>
+                  </tr>
+                  {/* row 9 */}
+                  <tr>
+                    <td>Альтернариоз</td>
+                    <td>7%</td>
+                    <td>⬆️⬇️</td>
+                    <td>3</td>
+                  </tr>
+                  {/* row 10 */}
+                  <tr>
+                    <td>Фузариоз</td>
+                    <td>7%</td>
+                    <td>⬆️⬇️</td>
+                    <td>3</td>
+                  </tr>
+                  {/* row 11 */}
+                  <tr>
+                    <td>Краснуха</td>
+                    <td>7%</td>
+                    <td>⬆️⬇️</td>
+                    <td>3</td>
+                  </tr>
+                  {/* row 12 */}
+                  <tr>
+                    <td>Бактериальный рак</td>
+                    <td>7%</td>
+                    <td>⬆️⬇️</td>
+                    <td>3</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div className="DataBlock2 p-3 shadow-lg">
+          <div>
+            <p className="text-xl font-bold">Настройки</p>
+          </div>
+          <div className="flex flex-row justify-between gap-4">
+            <div className="flex w-1/2 flex-col gap-2">
+              <p className="text-md">Координаты центра</p>
+              <div className="flex flex-col justify-between">
+                <span>Lat</span>
+                <input
+                  className="input input-xs w-3/4 !bg-gray-200"
+                  value={currentHexagon?.center[0]}
+                  disabled
+                />
+              </div>
+              <div className="flex flex-col justify-between">
+                <span>Long</span>
+                <input
+                  className="input input-xs w-3/4 !bg-gray-200"
+                  value={currentHexagon?.center[1]}
+                  disabled
+                />
+              </div>
+            </div>
+            <div className=" flex w-1/2 flex-col gap-2">
+              <p className="text-lg">Веса условий</p>
+              <form className="flex flex-col gap-2">
+                <div className="flex flex-col justify-between">
+                  <span>Оптимальных</span>
+                  <input id="opt" className="input input-xs w-3/4 bg-gray-200"></input>
+                </div>
+                <div className="flex flex-col justify-between">
+                  <span>Начальных</span>
+                  <input id="beg" className="input input-xs w-3/4 bg-gray-200"></input>
+                </div>
+                <div className="flex flex-col justify-between">
+                  <span>Без условий</span>
+                  <input id="no" className="input input-xs w-3/4 bg-gray-200"></input>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </>
