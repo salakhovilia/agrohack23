@@ -10,10 +10,13 @@ html, body {
 
 
 .container {
-  grid-template-areas:
-    "DataBlock MAP MAP"
-    "DataBlock MAP MAP"
-    "CurrentWeather TimeGraphs TimeGraphs";
+    grid-template-areas:
+    "DataBlock1 MAP MAP"
+    "DataBlock1 MAP MAP"
+    "DataBlock1 MAP MAP"
+    "DataBlock2 MAP MAP"
+    "DataBlock2 TimeGraphs TimeGraphs"
+    "DataBlock2 TimeGraphs TimeGraphs";
 }
 
 .MAP { grid-area: MAP; }
@@ -22,6 +25,8 @@ html, body {
 
 .CurrentWeather { grid-area: CurrentWeather; }
 
-.DataBlock { grid-area: DataBlock; }
+.DataBlock1 { grid-area: DataBlock1; }
+
+.DataBlock2 { grid-area: DataBlock2; }
 
 
