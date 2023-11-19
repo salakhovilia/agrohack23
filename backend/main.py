@@ -75,9 +75,9 @@ async def get_polygons(request: web.Request):
 
             probs = get_illness_prob_for_each_timeunit(
                 none_satisf_weight=0.5,
-                partially_satisf_weight=1.0,
-                optimally_satisf_weight=3.0,
-                exp_growth_weight=0.1,
+                partially_satisf_weight=2.0,
+                optimally_satisf_weight=6.0,
+                exp_growth_weight=1,
                 temps=temps,
                 hums=map_hums(hums),
                 illness_name=IllnessCase.BLACK_GNILL.name

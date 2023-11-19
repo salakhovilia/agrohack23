@@ -3,6 +3,7 @@ import math
 from incub_period import UnknownIncubPeriod, IncubPeriod
 from illness_cases_spec import IllnessCase
 from raw_data_to_cases_mapper import IllnessDays, IllnessConditEnc
+from sklearn.linear_model import LogisticRegression
 
 
 class WeightsProvider:
@@ -55,6 +56,16 @@ class PeriodValuesProvider():
             return incub_period.periodInHours()
         else:
             return incub_period.periodInDays()
+
+
+class WeightNormalizer:
+    def __init__(self, weight_provider: WeightsProvider):
+        self.weight_provider = weight_provider
+
+    def normalize(self, source: list[float]) -> list[float]:
+        values_sum = sum(source)
+        normalized_values = [x / values_sum for x in source]
+        return normalized_values
 
 
 class SlidingWindowIncubPeriodAccumulator:
@@ -163,3 +174,82 @@ class ForTargetDateWeightedExponentialAccumulator():
 
         # Normalize the values to convert into probabilities
         return self.normalize_weights(target_arr)
+
+
+def normalize_weights(weights: list[float]) -> list[float]:
+    total_weight_sum = sum(weights)
+    return [weight / total_weight_sum for weight in weights]
+
+
+class ForTargetDateWeightedExponentialAccumulator():
+    def __init__(self,
+                 illness: IllnessCase,
+                 encoded_values: list[IllnessConditEnc],
+                 illness_day_enc_weight_provider: WeightsProvider):
+        self.illness = illness
+        self.encoded_values = encoded_values
+        self.weights_provider = illness_day_enc_weight_provider
+
+    def get_weighted_value(self, value: IllnessConditEnc, index: int) -> float:
+        total_length = len(self.encoded_values)
+
+        base_weight = self.weights_provider.get_weight(illness_case=value)
+        return base_weight
+        # distance_from_end = total_length - (index + 1)
+        # adjusted_weight = self.adjust_exponential_weight(distance_from_end, total_length)
+        # return base_weight * adjusted_weight
+
+    def adjust_exponential_weight(self, distance_from_end: int, total_length: int) -> float:
+        # Exponential growth function
+        lambda_factor = self.weights_provider.lambda_factor  # Adjust this to control the rate of growth
+        # The factor should decrease as the distance from the end decreases
+        normalized_distance = distance_from_end / total_length
+        return math.exp(lambda_factor * (normalized_distance - 1))
+
+    # def normalize_weights(self, weights: list[float]) -> list[float]:
+    #     max_value = max(weights)
+    #     normalized_values = [val / max_value for val in weights]
+    #     return normalized_values
+
+    def calculate_ema(self, values: list[float], alpha: float) -> list[float]:
+        ema_values = []
+        ema_previous = values[0]  # You could also initialize this to 0 or another starting value.
+
+        for value in values:
+            ema_current = (value * alpha) + (ema_previous * (1 - alpha))
+            ema_values.append(ema_current)
+            ema_previous = ema_current
+
+        return ema_values
+
+    # def map(self) -> list[float]:
+    #     size = len(self.encoded_values)
+    #     target_arr = []
+    #     alpha = 2 / (size + 1)  # Example of how to calculate alpha.
+    #
+    #     for i, value in enumerate(self.encoded_values):
+    #         weighted_value = self.get_weighted_value(value, i)
+    #         target_arr.append(weighted_value)
+    #
+    #     # Apply EMA to the values
+    #     ema_values = self.calculate_ema(target_arr, alpha)
+    #
+    #     # Normalize the EMA values to convert into probabilities
+    #     return normalize_weights(ema_values)
+
+    def map(self) -> list[float]:
+        size = len(self.encoded_values)
+        target_arr = []
+        alpha = 2 / (size + 1)  # Example of how to calculate alpha.
+
+        # for i, value in enumerate(self.encoded_values):
+        #     weighted_value = self.get_weighted_value(value, i)
+        #     target_arr.append(weighted_value)
+
+        # Apply EMA to the values
+        ema_values = self.calculate_ema(target_arr, alpha)
+
+        # Normalize the EMA values to convert into probabilities
+        return normalize_weights(ema_values)
+
+# ... [rest of the class definition]
